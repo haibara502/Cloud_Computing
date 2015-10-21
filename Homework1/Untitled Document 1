@@ -1,2 +1,0 @@
-export HADOOP_HOME=/usr/bin/hadoop
-export CLASSPATH=.:/usr/bin/hadoop/share/hadoop/common/hadoop-common-2.7.1.jar:/usr/bin/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.7.1.jar:/usr/bin/hadoop/share/hadoop/common/lib/commons-cli-1.2.jar
