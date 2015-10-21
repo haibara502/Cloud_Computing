@@ -1,0 +1,23 @@
+0. 准备工作：
+	安装hadoop, 并且将hadoop需要的文件夹或包添加到环境变量中。
+	在服务器上建立自己的文件夹。下面是我建文件夹的例子（注：在添加好环境变量以后可以直接使用hdfs命令）:
+	hdfs dfs -mkdir /athena/Homework1
+1. 代码：
+	我写了三个class.
+	a. MainClass.java
+		这个class会一直运行，每隔4秒种运行DirThread类来监测里面是否有文件。
+	b. DirThread.java
+		这个class负责处理文件夹。它用hadoop的API得到文件夹中所有的file。
+		如果这个file是文件夹，那么递归处理这个文件夹；
+		如果这个file是文件，那么调用FileThread类来传输它。
+	c. FileThread.java
+		这个class负责将本地指定的某文件上传到服务器。并且在上传完成之后删除本地对应文件。
+2. 编译
+	首先是编译代码：
+		javac MainClass.java
+	然后打包
+		jar -cvf MainClass.jar ./*.class
+3. 运行命令
+	假设我本地监测的文件夹是~/Video，服务器上的文件夹是第0步中的例子/athena/Homework1，那么命令如下：
+		hadoop jar MainClass.jar MainClass ~/Video /athena/Homework1
+	一直运行这个命令就可以了。
