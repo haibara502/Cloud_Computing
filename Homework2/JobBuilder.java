@@ -11,6 +11,10 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 
 public class JobBuilder {
 	public static Job parseInputAndOutput(Tool tool, Configuration conf, String[] args) throws IOException {
@@ -22,7 +26,7 @@ public class JobBuilder {
 		Job job = new Job(conf, "Homework");
 		job.setJarByClass(tool.getClass());
 		
-		int length = args.size();
+		int length = args.length;
 		for (int i = 0; i < length - 1; ++i) {
 			FileInputFormat.addInputPath(job, new Path(args[i]));
 		}
