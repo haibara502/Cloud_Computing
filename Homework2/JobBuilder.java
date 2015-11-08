@@ -18,7 +18,7 @@ import org.apache.hadoop.io.LongWritable;
 
 public class JobBuilder {
 	public static Job parseInputAndOutput(Tool tool, Configuration conf, String[] args) throws IOException {
-		if (args.length != 2) {
+		if (args.length < 2) {
 			printUsage(tool, "<input> <output>");
 			return null;
 		}

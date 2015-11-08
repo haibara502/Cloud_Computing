@@ -1,0 +1,51 @@
+Homework2: Count the times of appearances of each word in the given files.
+
+1. Overall Thinking
+	First write a class that defines an job with which we can finish the task.
+	Then re-define the map procedure. Read one word at once and record their information.
+	After that, re-define the reduce procedure. Combine the contents with the same word and file.
+	Finally, group all the files together and finish the task.
+	
+2. Introduction to each class I defined.
+	a. Homework2Job.java
+		This java defines a job that is aimed to finish this task. It set all the parameters that we need in finishing this task. To simplify this class, I defined another class called JobBuilder.java. It will be explained later. By defining this extra class, this class can focus only on the parameters of the task.
+	b. JobBuilder.java
+		This java just handles the input. It first checks whether the input is legal. Then it assigns all the paths to the job and return the job.
+	c. Homework2Mapper.java
+		This java first setup the context and then deal with the contexts splitted by the input format. It enumerate each word and writes it to the data system with its path and a number one which means the word has shown once.
+	d. Homework2Reducer.java
+		This java merges all the contexts with same word and file and writes the results.
+		
+3. Using guidence
+	First compiler these classes.
+		javac Homework2Job.java
+	Then pack them.
+		jar -cvf Homework2Job.jar ./*.class
+	After that, upload all the files needed to be dealt with to the data system. (Suppose my working directory is /athena/Homework2)
+		hdfs dfs -put ./a.txt /athena/Homework2/a.txt
+	Finally, run the defined job.
+		hadoop jar Homework2Job.jar Homework2Job /athena/Homework2/a.txt /athena/Homework2/a_out
+	Now the final documents are in the directory "/athena/Homework2/a_out". Check the documents by using the command "hdfs dfs -cat ***".
+	
+4. Output example
+	I used two files. First is called "one". The other is called "twotwo".
+	In file "one", there are four words -- one, two, three, four. Each of them appears twice.
+	In file "twotwo", there are eight words, and, sepecifictly, word
+		one, two, three, c, d, no
+	each of them appears only once; word
+		a, b
+	appears twice.
+	And the final result of my program is as following:
+	
+	a:hdfs://localhost:9000/athena/Homework2/twotwo	2
+	b:hdfs://localhost:9000/athena/Homework2/twotwo	2
+	c:hdfs://localhost:9000/athena/Homework2/twotwo	1
+	d:hdfs://localhost:9000/athena/Homework2/twotwo	1
+	four:hdfs://localhost:9000/athena/Homework2/one	2
+	no:hdfs://localhost:9000/athena/Homework2/twotwo	1
+	one:hdfs://localhost:9000/athena/Homework2/one	2
+	one:hdfs://localhost:9000/athena/Homework2/twotwo	1
+	three:hdfs://localhost:9000/athena/Homework2/one	2
+	three:hdfs://localhost:9000/athena/Homework2/twotwo	1
+	two:hdfs://localhost:9000/athena/Homework2/one	2
+	two:hdfs://localhost:9000/athena/Homework2/twotwo	1
