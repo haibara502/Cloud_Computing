@@ -20,13 +20,26 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
 public class Homework2Mapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+	public static boolean isalnum(char c) {
+		if ((c >= 'a') && (c <= 'z'))
+			return true;
+		if ((c >= 'A') && (c <= 'Z'))
+			return true;
+		return ((c >='0') && (c <= '9'));
+	}
+	
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		String line = value.toString(), now = "";
 		String fileName = ((FileSplit)context.getInputSplit()).getPath().toString();
 		for (int i = 0; i <= line.length(); ++i) {
-			if ((i == line.length()) || ((i < line.length()) && (!Character.isISOControl(line.charAt(i))))) {
-				context.write(new Text(now + ':' + fileName), new IntWritable(1));
+			if ((i == line.length()) || ((i < line.length()) && (!isalnum(line.charAt(i))))) {
+				if (now.length() > 0) {
+					context.write(new Text(now + ':' + fileName), new IntWritable(1));
+				}
 				now = "";
+			}
+			else {
+				now += line.charAt(i);
 			}
 		}
 	}
