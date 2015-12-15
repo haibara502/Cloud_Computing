@@ -19,42 +19,19 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
-public class firstMapper extends Mapper<LongWritable, Text, Text, IntWritable> {	
-	private static Gson gson = new Gson();
-	private HashMap<String, Info> token = new HashMap<String, Info>();
-	
-	private void dealToken(long id, String sentence, int value) {
-		String now = "";
-		for (int i = 0; i <= sentence.length(); ++i) {
-			if ((i == sentence.length()) || ((i != sentence.length()) && (sentence[i] == ' ')))
-				if (now != "") {
-					Info preValue = token.get(now);
-					if (preValue == null)
-						token.put(now, new Info(id, value, i - now.length(), i));
-					else
-						preValue.addPos(value, i - now.length(), i);
-					now = "";
-				}
-		}
-	}
-	
-	private void emitToken(Context context) {
-		for (Map.Entry<String, Info> iterator : token.entrySet()) {
-			context.write(new Text(iterator.getKey()), iterator.getValue());
-		}
-	}
-	
+public class secondMapper extends Mapper<LongWritable, Text, Text, Text> {
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-		token.clear();
-		bbsSJTU sjtu = gson.fromJson(value.toString(), bbsSJTU.class);
-		long id = key;
-		String title = sjtu.getTitle();
-		String context = sjtu.getContext();
+		String fileName = ((FileSplit)context.getInputSplit()).getPath().toString();
+		String firstIndex = value.toString();
+		String token = "";
+		for (int i = 0; i < firstIndex.size(); ++i) {
+			if (firstIndex[i] == ' ')
+				break;
+			token += firstIndex[i];
+		}
 		
-		dealToken(id, title, 5);
-		dealToken(id, context, 1);
-		
-		emitToken(context);
+		String infor = fileName + '#' + key.toString();
+		context.write(new Text(token), new Text(infor));
 	}
 	
 	public void run(Context context) throws IOException, InterruptedException{

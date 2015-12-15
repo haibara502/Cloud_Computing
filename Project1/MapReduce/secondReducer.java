@@ -17,17 +17,12 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
-public class firstReducer extends Reducer<Text, Info, Text, Text> {
-	public void reduce(Text key, Iterable<Info> values, Context context) throws IOException, InterruptedException{
-		int count = 0;
-		for (Info value : values) {
-			count ++;
-		}
+public class secondReducer extends Reducer<Text, Text, Text, Text> {
+	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 		String multiInfo = "";
-		for (Info value : values) {
-			value.reRank(count);
+		for (Text value : values) {
 			if (multiInfo.length())
-				multiInfo += ';';
+				multiInfo += '@';
 			multiInfo += value.toString();
 		}
 		context.write(key, new Text(multiInfo));

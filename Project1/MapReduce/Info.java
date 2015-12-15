@@ -4,68 +4,69 @@ import org.apache.hadoop.io.*;
 public class Info implements WritableComparable<Info> {
 	private long id;
 	private double rank;
-	private pair<int, int> position;
+	private ArrayList<int> posBegin;
+	private ArrayList<int> posEnd;
+	
+	private static int num1 = 13777;
+	private static int num2 = 957777;
 	
 	public Info() {
-		set(new String(), new String(), new double(), new pair<new int(), new int()>);
+		set(new long(), new double(), new ArrayList<int>, new ArrayList<int>);
 	}
 	
-	public Info(String _token, String _url, double _rank, pair<int, int> _position) {
-		set(_token, _url, _rank, _position);
+	public Info(long _id, double _rank, int _posBegin, int _posEnd) {
+		ArrayList<int> tempBegin = new ArrayList<int>;
+		ArrayList<int> tempEnd = new ArrayList<int>;
+		tempBegin.add(_posBegin);
+		tempEnd.add(_posEnd);
+		set(_id, _rank, tempBegin, tempEnd);
 	}
 	
-	public void set(String _token, String _url, double _rank, pair<int, int> _position) {
-		this.token = _token;
-		this.url = _url;
+	public void set(long _id, double _rank, ArrayList<int> _posBegin, ArrayList<int> _posEnd) {
+		this.id = _id;
 		this.rank = _rank;
-		this.position = _position;
-	}
-	
-	public String getToken() {
-		return token;
-	}
-	
-	public String getUrl() {
-		return url;
+		this.posBegin = _posBegin;
+		this.posEnd = _posEnd;
 	}
 	
 	public double getRank() {
 		return rank;
 	}
 	
-	public pair<int, int> getPosition() {
-		return position;
+	public int getPosBegin(int pos) {
+		return posBegin.get(pos);
+	}
+	
+	public int getPosEnd(int pos) {
+		return posEnd.get(pos);
+	}
+	
+	public int getTotalPos() {
+		return posBegin.size();
 	}
 	
 	@Override
 	public void write(DataOutput out) throws IOException {
-		token.write(out);
-		url.write(out);
+		id.write(out);
 		rank.write(out);
-		position.write(out);
+		posBegin.write(out);
+		posEnd.write(out);
 	}
 	
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		token.readFields(in);
-		url.readFields(in);
+		id.readFields(in);
 		rank.readFields(in);
-		position.readFields(in);
+		posBegin.readFields(in);
+		posEnd.readFields(in);
 	}
 	
 	@Override
 	public int hashCode() {
+		String thisTemp = this.toString();
 		int hash = 0;
-		for (int i = 0; i < token.length(); ++i)
-			hash = ((hash * num1) + token[i]) % num2;
-		for (int i = 0; i < url.length(); ++i)
-			hash = ((hash * num3) + url[i]) % num4;
-		String rankTemp = rank.toString();
-		for (int i = 0; i < rankTemp.length(); ++i)
-			hash = ((hash * num5) + rankTemp[i]) % num6;
-		String positionTemp = position.toString();
-		for (int i = 0; i < positionTemp.length(); ++i)
-			hash = ((hash * num7) + positionTemp[i]) % num8;
+		for (int i = 0; i < thisTemp.length(); ++i)
+			hash = (hash * num1 + thisTemp[i]) % num2;
 		return hash;
 	}
 	
@@ -73,25 +74,32 @@ public class Info implements WritableComparable<Info> {
 	public boolean equals(Object o) {
 		if (o instanceof Info) {
 			Info info = (Info) o;
-			return (token.equals(info.token) && url.equals(info.url) && (rank.equals(info.rank)) && (position.equals(info.position)));
+			return (id.equals(info.id) && (rank.equals(info.rank)) && (posBegin.equals(info.posBegin)) && (posEnd.equals(info.posEnd)));
 	}
 	
 	@Override
 	public String toString() {
-		return token + '#' + url + '#' + rank.toString() + '#' + position.toString();
+		String position = "";
+		int total = this.getTotalPos();
+		for (int i = 0; i < total; ++i) {
+			if (i)
+				position += "%";
+			position += posBegin.get(i).toString() + '|' + posEnd.get(i).toString();
+		}
+		return id + ':' + rank.toString() + ':' + position;
 	}
 	
 	@Override
 	public int compareTo(Info info) {
-		int cmp = token.compareTo(info.token);
-		if (cmp != 0)
-			return cmp;
-		cmp = url.compareTo(info.url);
+		int cmp = id.compareTo(info.id);
 		if (cmp != 0)
 			return cmp;
 		cmp = rank.compareTo(info.rank);
 		if (cmp != 0)
 			return cmp;
-		return position.compareTo(info.position);
+		cmp = posBegin.compareTo(info.posBegin);
+		if (cmp != 0)
+			return cmp;
+		return posEnd.compareTo(info.posEnd);
 	}
 }
