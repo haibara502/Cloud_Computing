@@ -1,0 +1,4 @@
+items.json is the file crawled by the spider in ../Crawler.
+segOutput.txt is the file segmented from items.json by the segmenter from stanford. The segmenter is easy to use. Its current location is ~/Softs/stanford-segmenter.
+handleOutput.txt is the wrong version of tuning the output by segmenter since I erased all the blankets.
+handleAgainOutput.txt is the final version of tuning the output. It can be used by MapReduce.
