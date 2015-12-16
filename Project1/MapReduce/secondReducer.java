@@ -21,7 +21,7 @@ public class secondReducer extends Reducer<Text, Text, Text, Text> {
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 		String multiInfo = "";
 		for (Text value : values) {
-			if (multiInfo.length())
+			if (multiInfo.length() > 0)
 				multiInfo += '@';
 			multiInfo += value.toString();
 		}

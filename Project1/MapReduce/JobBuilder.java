@@ -58,9 +58,9 @@ public class JobBuilder {
 		job.setJarByClass(tool.getClass());
 		
 		String uri = args[0];
-		FileSystem fs = FileSystem.get(URI.create(uri), conf);
+		FileSystem fs = FileSystem.get(new Path(uri).toUri(), conf);
 		
-		FileStatus[] status = fs.listStatus(new Path(args[0]);
+		FileStatus[] status = fs.listStatus(new Path(args[0]));
 		for (FileStatus fStatus : status) {
 			if (fStatus.isDir() == false)
 				FileInputFormat.addInputPath(job, new Path(fStatus.getPath().toUri().getPath()));

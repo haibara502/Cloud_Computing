@@ -18,35 +18,26 @@ import org.apache.hadoop.io.LongWritable;
 
 public class aJob extends Configured implements Tool {
 	public int run(String[] args) throws Exception {
-		String[] firstArgs = null;
-		firstArgs.add(args[0]);
-		firstArgs.add(args[1]);
-		Job jobFirst = JobBuilder.firstIndex(this, getConf(), firstArgs);
-		if (job == null) {
+		String[] firstArgs = {args[0], args[1]};
+		Job jobFirst = JobBuilder.jobFirst(this, getConf(), firstArgs);
+		if (jobFirst == null) {
 			return -1;
 		}
 		
-		String[] secondArgs = null;
-		secondArgs.add(args[2]);
-		secondArgs.add(args[3]);
-		Job jobSecond = JobBuilder.secondIndex(this, getConf(), secondArgs);
+		String[] secondArgs = {args[2], args[3]};
+		Job jobSecond = JobBuilder.jobSecond(this, getConf(), secondArgs);
 		if (jobSecond == null) {
 			return -1;
 		}
 		
-		JobClient.runJob(jobFirst);
 		if (jobFirst.waitForCompletion(true) == false) {
 			return 1;
 		}
-		JobClient.runJob(jobSecond);
 		return jobSecond.waitForCompletion(true)? 0 : 1;
-		
-		
-		return job.waitForCompletion(true)? 0 : 1;
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int exitCode = ToolRunner.run(new Job(), args);
+		int exitCode = ToolRunner.run(new aJob(), args);
 		System.exit(exitCode);
 	}
 }

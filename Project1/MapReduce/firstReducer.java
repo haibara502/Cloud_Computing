@@ -26,7 +26,7 @@ public class firstReducer extends Reducer<Text, Info, Text, Text> {
 		String multiInfo = "";
 		for (Info value : values) {
 			value.reRank(count);
-			if (multiInfo.length())
+			if (multiInfo.length() > 0)
 				multiInfo += ';';
 			multiInfo += value.toString();
 		}

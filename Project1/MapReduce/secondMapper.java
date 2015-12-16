@@ -24,10 +24,10 @@ public class secondMapper extends Mapper<LongWritable, Text, Text, Text> {
 		String fileName = ((FileSplit)context.getInputSplit()).getPath().toString();
 		String firstIndex = value.toString();
 		String token = "";
-		for (int i = 0; i < firstIndex.size(); ++i) {
-			if (firstIndex[i] == ' ')
+		for (int i = 0; i < firstIndex.length(); ++i) {
+			if (firstIndex.charAt(i) == ' ')
 				break;
-			token += firstIndex[i];
+			token += firstIndex.charAt(i);
 		}
 		
 		String infor = fileName + '#' + key.toString();

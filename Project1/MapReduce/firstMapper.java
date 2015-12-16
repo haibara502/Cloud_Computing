@@ -19,14 +19,16 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 
-public class firstMapper extends Mapper<LongWritable, Text, Text, IntWritable> {	
+import com.google.gson.*;
+
+public class firstMapper extends Mapper<LongWritable, Text, Text, Info> {	
 	private static Gson gson = new Gson();
 	private HashMap<String, Info> token = new HashMap<String, Info>();
 	
 	private void dealToken(long id, String sentence, int value) {
 		String now = "";
 		for (int i = 0; i <= sentence.length(); ++i) {
-			if ((i == sentence.length()) || ((i != sentence.length()) && (sentence[i] == ' ')))
+			if ((i == sentence.length()) || ((i != sentence.length()) && (sentence.charAt(i) == ' ')))
 				if (now != "") {
 					Info preValue = token.get(now);
 					if (preValue == null)
@@ -38,7 +40,7 @@ public class firstMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		}
 	}
 	
-	private void emitToken(Context context) {
+	private void emitToken(Context context) throws IOException, InterruptedException {
 		for (Map.Entry<String, Info> iterator : token.entrySet()) {
 			context.write(new Text(iterator.getKey()), iterator.getValue());
 		}
@@ -47,12 +49,12 @@ public class firstMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		token.clear();
 		bbsSJTU sjtu = gson.fromJson(value.toString(), bbsSJTU.class);
-		long id = key;
+		long id = key.get();
 		String title = sjtu.getTitle();
-		String context = sjtu.getContext();
+		String content = sjtu.getContext();
 		
 		dealToken(id, title, 5);
-		dealToken(id, context, 1);
+		dealToken(id, content, 1);
 		
 		emitToken(context);
 	}
