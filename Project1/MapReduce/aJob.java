@@ -24,16 +24,17 @@ public class aJob extends Configured implements Tool {
 			return -1;
 		}
 		
+		if (jobFirst.waitForCompletion(true) == false) {
+			return 1;
+		}
+		
 		String[] secondArgs = {args[2], args[3]};
 		Job jobSecond = JobBuilder.jobSecond(this, getConf(), secondArgs);
 		if (jobSecond == null) {
 			return -1;
 		}
-		
-		if (jobFirst.waitForCompletion(true) == false) {
-			return 1;
-		}
 		return jobSecond.waitForCompletion(true)? 0 : 1;
+		
 	}
 	
 	public static void main(String[] args) throws Exception {

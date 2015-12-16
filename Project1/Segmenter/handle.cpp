@@ -15,6 +15,8 @@ int main()
 	istringstream is;
 	while (cin >> input)
 	{
+		if (input == "")
+			break;
 		cout << input; //{"url"
 		cin >> input;
 		cout << input; //:
@@ -36,39 +38,65 @@ int main()
 		
 		char line[100000];
 		gets(line);
+		bool ff = false;
 		//cerr << "+" << line << endl;
-		while (!((line[0] == '"') && (line[1] == ' ') && (line[2] == ']')))
+		while (line[0])
 		{
+			int length = strlen(line);
+			//cerr << "!" << line << "#" << endl;
+			for (int i = 1; i < length - 5; ++i)
+				if ((line[i - 1] == '"') && (line[i] == 't') && (line[i + 1] == 'i') && (line[i + 2] == 't') && (line[i + 3] == 'l') && (line[i + 4] == 'e'))
+				{
+					//cerr << "+" << line << "#" << endl;
+					int j = i - 1;
+					string vStandard = "\"],\"";
+					int pointer = vStandard.size() - 1;
+					for (; (j >= 0) && (pointer >= 0); --j)
+						if (line[j] == vStandard[pointer])
+							--pointer;
+					for (int e = 0; e <= j; ++e)
+						cout << line[e];
+					cout << "$";
+					string temp = string(line).substr(j + 1, strlen(line) - j - 1);
+					for (int i = 0; i < temp.size(); ++i)
+						line[i] = temp[i];
+					line[temp.size()] = 0;
+					ff = true;
+					break;
+				}
+			if (ff)
+				break;
 			cout << line << "$";
-			//cerr << line << "$";
+			line[0] = 0;
 			gets(line);
 		}
 		//cerr << "-" << line << "#" << endl;
-		cout << line[0] << line[2] << line[4]; //"],
-		for (int i = 6; i < 13; ++i)
-			cout << line[i]; //"title"
-		cout << line[14] << line[16] << line[18]; //:["
-		//cerr << "#" << endl;
-		int i = 20;
-		for (; ; ++i)
-		{
-			if ((line[i] == ' ') && (line[i + 1] == '"'))
-				break;
-			cout << line[i];
-		}
-		//cerr << "#" << endl;
+		string aStandard = "\"],\"title\":[\"";
+		int i = 0, pointer = 0;
 		int length = strlen(line);
+		for (; (i < length) && (pointer < aStandard.size()); ++i)
+			if (line[i] == aStandard[pointer])
+			{
+				cout << line[i];
+				++pointer;
+			}
+		//cerr << "#" << endl;
 		for (; i < length; ++i)
 			if (line[i] != ' ')
 				cout << line[i];
 		
 		//cerr << "#" << endl;
 		gets(line);
-		for (i = 0; i < 20; ++i)
-			if (line[i] != ' ')
+		//cerr << "#" << line << "#" << endl;
+		string standard = "\"],\"author\":[\"";
+		int point = 0;
+		for (i = 0; point < standard.size(); ++i)
+			if (line[i] == standard[point])
+			{
 				cout << line[i];
-				
-		//cerr << "#" << endl;
+				++point;
+			}
+		//cout << "#" << endl;
 		for (; line[i] != '"'; ++i)
 			if (line[i] != ' ')
 				cout << line[i];

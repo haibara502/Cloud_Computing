@@ -19,17 +19,26 @@ import org.apache.hadoop.io.LongWritable;
 
 public class firstReducer extends Reducer<Text, Info, Text, Text> {
 	public void reduce(Text key, Iterable<Info> values, Context context) throws IOException, InterruptedException{
+		//System.out.println("In reduce");
+		ArrayList<Info> storeV = new ArrayList<Info>();
 		int count = 0;
 		for (Info value : values) {
 			count ++;
+			storeV.add(value);
 		}
+		//System.out.println(count);
 		String multiInfo = "";
-		for (Info value : values) {
+		for (Info value : storeV) {
+			//System.out.println(value.getRank() + value.getTotalPos() + value.toString());
 			value.reRank(count);
-			if (multiInfo.length() > 0)
-				multiInfo += ';';
-			multiInfo += value.toString();
+			//System.out.println(value.getRank() + value.getTotalPos() + value.toString());
+			if (value.toString().length() > 0) {
+				if (multiInfo.length() > 0)
+					multiInfo += ";";
+				multiInfo += value.toString();
+			}
 		}
-		context.write(key, new Text(multiInfo));
+		if (multiInfo.length() > 0)
+			context.write(key, new Text(multiInfo));
 	}
 }

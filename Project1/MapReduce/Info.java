@@ -61,11 +61,13 @@ public class Info implements WritableComparable<Info> {
 		id.write(out);
 		rank.write(out);
 		
-		IntArrayWritable _begin = new IntArrayWritable(posBegin);
-		_begin.write(out);
+		IntWritable number = new IntWritable(this.getTotalPos());
+		number.write(out);
 		
-		IntArrayWritable _end = new IntArrayWritable(posEnd);
-		_end.write(out);
+		for (int i = 0; i < number.get(); ++i) {
+			posBegin.get(i).write(out);
+			posEnd.get(i).write(out);
+		}
 	}
 	
 	@Override
@@ -73,11 +75,18 @@ public class Info implements WritableComparable<Info> {
 		id.readFields(in);
 		rank.readFields(in);
 		
-		IntArrayWritable _begin = new IntArrayWritable(posBegin);
-		_begin.readFields(in);
+		IntWritable number = new IntWritable();
+		number.readFields(in);
 		
-		IntArrayWritable _end = new IntArrayWritable(posEnd);
-		_end.readFields(in);
+		posBegin = new ArrayList<IntWritable>();
+		posEnd = new ArrayList<IntWritable>();
+		for (int i = 0; i < number.get(); ++i) {
+			IntWritable temp = new IntWritable();
+			temp.readFields(in);
+			posBegin.add(new IntWritable(temp.get()));
+			temp.readFields(in);
+			posEnd.add(new IntWritable(temp.get()));
+		}
 	}
 	
 	@Override
@@ -93,12 +102,17 @@ public class Info implements WritableComparable<Info> {
 	public boolean equals(Object o) {
 		if (o instanceof Info) {
 			Info info = (Info) o;
-			IntArrayWritable _begin = new IntArrayWritable(posBegin);
-			IntArrayWritable _end = new IntArrayWritable(posEnd);
-			IntArrayWritable infoBegin = new IntArrayWritable(info.posBegin);
-			IntArrayWritable infoEnd = new IntArrayWritable(info.posEnd);
-			return (id.equals(info.id) && (rank.equals(info.rank)) && (_begin.equals(infoBegin)) && (_end.equals(infoEnd)));
+			ArrayList<IntWritable> remain = new ArrayList(posBegin);
+			remain.removeAll(info.posBegin);
+			if (remain.size() > 0)
+				return false;
+			remain = new ArrayList(posEnd);
+			remain.removeAll(info.posEnd);
+			if (remain.size() > 0)
+				return false;
+			return (id.equals(info.id)) && (rank.equals(info.rank));
 		}
+		return false;
 	}
 	
 	@Override
@@ -108,9 +122,9 @@ public class Info implements WritableComparable<Info> {
 		for (int i = 0; i < total; ++i) {
 			if (i > 0)
 				position += "%";
-			position += posBegin.get(i).toString() + '|' + posEnd.get(i).toString();
+			position += posBegin.get(i).toString() + "|" + posEnd.get(i).toString();
 		}
-		return id.toString() + ':' + rank.toString() + ':' + position;
+		return id.toString() + ":" + rank.toString() + ":" + position;
 	}
 	
 	@Override
@@ -121,13 +135,16 @@ public class Info implements WritableComparable<Info> {
 		cmp = rank.compareTo(info.rank);
 		if (cmp != 0)
 			return cmp;
-		IntArrayWritable _begin = new IntArrayWritable(posBegin);
-		IntArrayWritable infoBegin = new IntArrayWritable(info.posBegin);
-		cmp = _begin.compareTo(infoBegin);
-		if (cmp != 0)
-			return cmp;
-		IntArrayWritable _end = new IntArrayWritable(posEnd);
-		IntArrayWritable infoEnd = new IntArrayWritable(info.posEnd);
-		return _end.compareTo(infoEnd);
+		int number = this.getTotalPos();
+		for (int i = 0; i < number; ++i)
+		{
+			cmp = posBegin.get(i).compareTo(info.posBegin.get(i));
+			if (cmp != 0)
+				return cmp;
+			cmp = posEnd.get(i).compareTo(info.posEnd.get(i));
+			if (cmp != 0)
+				return cmp;
+		}
+		return 0;
 	}
 }

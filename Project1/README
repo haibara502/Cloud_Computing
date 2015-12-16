@@ -1,0 +1,49 @@
+整个代码分成三个部分。
+
+1. Crawler
+	这个文件夹里面是爬虫。我写了一个爬虫是爬交大的BBS，但是交大的BBS没有forum和hot这两个值，所以就只爬了另外三个。不过其实都可以爬的，只要那个页面上有。这个交大BBS的爬虫在./Spider/aSpider.py。
+	运行很简单，进入Crawler的根目录，输入命令scrapy crawl aSpider >output.txt 就可以了。没有最后那个你就会输出到屏幕上噢。
+
+2. Segmenter
+	这个文件夹是把爬到的文件分词。我实在没学会IKAnalyzer，就用了stanford的segmenter。不过segmenter有两个很不爽的地方：
+		a. 用json来弄的，所以强行把它原来帖子里面的换行符用'$'来代替，这样可以把一个帖子对应的内容放到一行。如果要输出具体帖子的内容，就要把'$'再换成换行符。在分词的时候我没细处理这个符号，导致分出来的一些词词头有带这个符号QAQ不过觉得这个我后面特判一下或者怎么暴力弄一下就好了，暂时还是个bug。
+		b. 它是把整个文件分词，导致我的url等都被分开了QAQ所以我只好再写了一个handle.cpp用来把不要的空格去掉。后来为了学那个网站上的google.gson，强行凑格式。最后我放弃按照那个网站凑格式了，用了我自己定义的格式。但是还留下一个pune.cpp用来再优化一下格式。
+	Stanford的segmenter太大了我就不发给你了。下载很方便。搜索stanford NLP segmenter下载压缩包然后照着README运行它的bash文件就好，命令就一行，简单。
+	所以总的运行过程是：
+	stanford的segmenter的bash
+	make handle
+	./handle <input >output
+	make pune
+	./pune <input >output
+3. MapReduce
+	这个文件夹是用来生成索引的。文件有点多，先解释一下：
+	aJob.java
+		运行开始的主程序。先做出索引，再做二级索引。
+	bbsSJTU.java
+		保存交大BBS我爬下来的信息的类。主要用来处理读入。
+	firstMapper.java
+		索引的Mapper。
+	firstPartitioner.java
+		索引的Partitioner。
+	firstReducer.java
+		索引的Reducer。
+	Info.java
+		从Mapper到Reducer需要一个Writable来传递，我自己定义了这个类。
+	JobBuilder.java
+		这个是用来生成特定的job。first就是索引，second就是二级索引。job的参数在这里设置。
+	RegexPathFilter.java
+		这个是用来过滤文件夹里面的文件。因为在运行的时候hadoop会有多余的文件在文件夹里，所以我用正则表达式设置了一下允许读入的文件，用来给二级索引当输入。
+	secondMapper.java
+		二级索引的Mapper。
+	secondReducer.java
+		二级索引的Reducer。
+	储存索引的格式我是按照你发给我的那个网站上那个人定义的格式来的。所以如果看不懂我的输出的话你可以去看看他是怎么定义的。强行把很多信息压成一行。
+	运行过程是：
+	首先一个个javac所有的.java文件。
+	jar -cvf aJob.jar ./*.class
+	hdfs dfs -put 输入文件 目标地址
+	hadoop aJob.jar aJob 一级索引输入 一级索引输出 二级索引输入 二级索引输出
+	就可以了～
+	
+	因为hadoop在reduce以后会把reduce得到的所有文件放在你指定的输出文件夹里面，所以其实一级索引的输出连着运行的话就是二级索引的输入啦。
+	大致就是这样了么么哒～

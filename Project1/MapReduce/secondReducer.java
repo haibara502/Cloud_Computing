@@ -25,6 +25,7 @@ public class secondReducer extends Reducer<Text, Text, Text, Text> {
 				multiInfo += '@';
 			multiInfo += value.toString();
 		}
+		//System.out.println(key.toString() + "@@@@@@@@" + multiInfo);
 		context.write(key, new Text(multiInfo));
 	}
 }

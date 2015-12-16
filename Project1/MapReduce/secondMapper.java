@@ -25,13 +25,15 @@ public class secondMapper extends Mapper<LongWritable, Text, Text, Text> {
 		String firstIndex = value.toString();
 		String token = "";
 		for (int i = 0; i < firstIndex.length(); ++i) {
-			if (firstIndex.charAt(i) == ' ')
+			if (firstIndex.charAt(i) == '\t')
 				break;
 			token += firstIndex.charAt(i);
 		}
 		
-		String infor = fileName + '#' + key.toString();
+		String infor = fileName + "#" + key.toString();
 		context.write(new Text(token), new Text(infor));
+		//System.out.println(token + "@@@@@@@@@@@@@" + value.toString());
+		//while(true);
 	}
 	
 	public void run(Context context) throws IOException, InterruptedException{

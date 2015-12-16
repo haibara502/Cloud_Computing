@@ -22,13 +22,13 @@ import org.apache.hadoop.io.LongWritable;
 import com.google.gson.*;
 
 public class firstMapper extends Mapper<LongWritable, Text, Text, Info> {	
-	private static Gson gson = new Gson();
 	private HashMap<String, Info> token = new HashMap<String, Info>();
 	
 	private void dealToken(long id, String sentence, int value) {
 		String now = "";
 		for (int i = 0; i <= sentence.length(); ++i) {
-			if ((i == sentence.length()) || ((i != sentence.length()) && (sentence.charAt(i) == ' ')))
+			//System.out.println(sentence.length() + "?" + i + "]" + now);
+			if ((i == sentence.length()) || ((i != sentence.length()) && (sentence.charAt(i) == ' '))) {
 				if (now != "") {
 					Info preValue = token.get(now);
 					if (preValue == null)
@@ -37,6 +37,8 @@ public class firstMapper extends Mapper<LongWritable, Text, Text, Info> {
 						preValue.addPos(value, i - now.length(), i);
 					now = "";
 				}
+			}
+			else now += sentence.charAt(i);
 		}
 	}
 	
@@ -47,16 +49,19 @@ public class firstMapper extends Mapper<LongWritable, Text, Text, Info> {
 	}
 	
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-		token.clear();
-		bbsSJTU sjtu = gson.fromJson(value.toString(), bbsSJTU.class);
-		long id = key.get();
-		String title = sjtu.getTitle();
-		String content = sjtu.getContext();
+			token.clear();
+			bbsSJTU sjtu = new bbsSJTU(value.toString());
+			long id = key.get();
+			String title = sjtu.getTitle();
+			String content = sjtu.getContent();
+			//System.out.println(title + "!" + content);
 		
-		dealToken(id, title, 5);
-		dealToken(id, content, 1);
+			dealToken(id, title, 5);
+			dealToken(id, content, 1);
 		
-		emitToken(context);
+			for (Map.Entry<String, Info> iterator : token.entrySet()) {
+				context.write(new Text(iterator.getKey()), iterator.getValue());
+			}
 	}
 	
 	public void run(Context context) throws IOException, InterruptedException{

@@ -45,6 +45,8 @@ public class JobBuilder {
 		
 		job.setOutputFormatClass(TextOutputFormat.class);
 		
+		job.setNumReduceTasks(30);
+		
 		return job;
 	}
 	
@@ -60,7 +62,7 @@ public class JobBuilder {
 		String uri = args[0];
 		FileSystem fs = FileSystem.get(new Path(uri).toUri(), conf);
 		
-		FileStatus[] status = fs.listStatus(new Path(args[0]));
+		FileStatus[] status = fs.listStatus(new Path(uri), new RegexPathFilter(".*\\/part\\-r\\-[0-9]*"));
 		for (FileStatus fStatus : status) {
 			if (fStatus.isDir() == false)
 				FileInputFormat.addInputPath(job, new Path(fStatus.getPath().toUri().getPath()));
